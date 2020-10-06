@@ -1,0 +1,133 @@
+openapi: "3.0.0"
+info:
+  version: 0.0.1
+  title: twitter
+paths:
+  /feed/:
+    get:
+      tags:
+          - tweets
+      security: 
+      - bearerAuth: []
+      summary: get all tweets form the following users and the current user
+      responses:
+          200:
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    type: 
+                    $ref: "#/components/schemas/tweet"
+
+  /users/{userId}/:
+    get:
+      tags:
+          - users
+      security:
+          - bearerAuth: []
+      summary: get the profile of the user with id userId
+      parameters:
+          - in: path
+            name: user id
+            required: true
+            schema:
+              type: string
+      responses:
+          200:
+            description: OK
+            content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/user'
+                      tweets:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/tweet'
+
+  /tweets/:
+    post:
+      tags:
+          - tweets
+      summary: create a new tweet
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+      responses:
+          200:
+            description: OK
+components:
+    schemas:
+        user:
+          type: object
+          properties:
+              id: 
+                type: string
+                format: uuid
+              nickname:
+                type: string
+              username:
+                type: string
+              email: 
+                type: string
+                format: email
+              bio:
+                type: string
+              photoUrl: 
+                type: string
+                format: url
+              bannerUrl:
+                type: string 
+                format: url
+              following:
+                type: array
+                items:
+                  $ref: '#/components/schemas/basicUser'
+              followers:
+                type: array
+                items:
+                  $ref: '#/components/schemas/basicUser'
+        
+        basicUser:
+          type: object
+          properties:
+              id: 
+                type: string
+                format: uuid
+              nickname:
+                type: string
+              username:
+                type: string
+              email: 
+                type: string
+                format: email
+              photoUrl: 
+                type: string
+                format: url
+
+        tweet:
+          type: object
+          properties:
+              id:
+                type: string 
+                format: uuid
+              user:
+                $ref: '#/components/schemas/basicUser'
+              text:
+                type: string
+              createdAt:
+                type: string
+                format: date-time
+              likes:
+                type: array
+                items:
+                  $ref: '#/components/schemas/basicUser'
