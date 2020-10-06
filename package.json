@@ -7,10 +7,10 @@
     "doc": "docs"
   },
   "scripts": {
-    "start": "cd website/client && react-scripts start",
-    "build": "cd website/client && react-scripts build",
-    "test": "cd website/client && react-scripts test",
-    "eject": "cd website/client && react-scripts eject"
+    "client-start": "cd website/client && npm run start",
+    "client-build": "cd website/client && npm run build",
+    "client-test": "cd website/client && npm run test",
+    "client-eject": "cd website/client && npm run eject"
   },
   "keywords": [],
   "author": "",
