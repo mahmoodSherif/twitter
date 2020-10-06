@@ -1,8 +1,23 @@
 {
   "name": "server",
-  "version": "0.0.0",
-  "private": true,
+  "version": "1.0.0",
+  "description": "",
   "scripts": {
     "start": "node ./bin/www"
-  }
+  },
+  "dependencies": {
+    "express": "~4.16.1",
+    "faker": "^5.1.0",
+    "http-errors": "~1.6.3",
+    "morgan": "~1.9.1",
+    "debug": "~2.6.9"
+  },
+  "devDependencies": {
+    "eslint": "^7.10.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.22.1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
