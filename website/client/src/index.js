@@ -1,17 +1,32 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import {
+  BrowserRouter as Router, Link, Route, Switch,
+} from 'react-router-dom';
+import Feed from './components/TweetList/TweetList';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+    <Router>
+      <div>
+        <ul>
+          <li>
+            <Link to="/feed">feed</Link>
+          </li>
+          <li>
+            <Link to="/profile">profile</Link>
+          </li>
+        </ul>
+      </div>
+      <Switch>
+        <Route exact path="/feed">
+          <Feed />
+        </Route>
+        <Route exact path="/profile">
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+        </Route>
+      </Switch>
+    </Router>
+  </React.StrictMode>,
+  document.getElementById('root'),
+);
