@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import {
   BrowserRouter as Router, Link, Route, Switch,
 } from 'react-router-dom';
-import Feed from './components/TweetList/TweetList';
+import App from './App';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -20,7 +20,7 @@ ReactDOM.render(
       </div>
       <Switch>
         <Route exact path="/feed">
-          <Feed />
+          <App />
         </Route>
         <Route exact path="/profile">
 
