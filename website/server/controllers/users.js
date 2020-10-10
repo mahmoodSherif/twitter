@@ -25,7 +25,35 @@ async function findUserById(req, res, next) {
   }
 }
 
+async function follow(req, res, next) {
+  const { userId } = req.body;
+  const { followerId } = req.body; // the current user
+  const queryText = `INSERT INTO following (userId, followerId) 
+    VALUES ('${userId}', '${followerId}') ON CONFLICT DO NOTHING`;
+  try {
+    await db.query(queryText);
+    res.json(200);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function unfollow(req, res, next) {
+  const { userId } = req.body;
+  const { followerId } = req.body; // the current user
+  const queryText = `DELETE FROM following
+    WHERE userId = '${userId}' AND followerId = '${followerId}' `;
+  try {
+    await db.query(queryText);
+    res.json(200);
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   createUser,
   findUserById,
+  follow,
+  unfollow,
 };
