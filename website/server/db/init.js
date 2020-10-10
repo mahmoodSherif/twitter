@@ -33,8 +33,18 @@ async function createTweetsLikesTable() {
   await db.query(queryText);
 }
 
+async function createFollowingTable() {
+  const queryText = `CREATE TABLE IF NOT EXISTS following (
+    userId INT references users(id),
+    followerId INT references users(id),
+    PRIMARY KEY(followerId, userId)
+    );`;
+  await db.query(queryText);
+}
+
 (async () => {
   await createUsersTable();
   await createTweetsTable();
   await createTweetsLikesTable();
+  await createFollowingTable();
 })().catch((err) => console.log(err));
