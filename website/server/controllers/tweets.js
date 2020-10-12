@@ -39,8 +39,36 @@ async function tweetsByUserId(req, res, next) {
   }
 }
 
+async function likeTweet(req, res, next) {
+  const { userId } = req.body;
+  const { tweetId } = req.params;
+  const queryText = `INSERT INTO tweetsLikes (userId, tweetId) 
+    VALUES ('${userId}', '${tweetId}') ON CONFLICT DO NOTHING`;
+  try {
+    await db.query(queryText);
+    res.sendStatus(200);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function unLikeTweet(req, res, next) {
+  const { userId } = req.body;
+  const { tweetId } = req.params;
+  const queryText = `DELETE FROM tweetsLikes WHERE userId = '${userId}' 
+    AND tweetId = '${tweetId}' `;
+  try {
+    await db.query(queryText);
+    res.sendStatus(200);
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   feed,
   createTweet,
   tweetsByUserId,
+  likeTweet,
+  unLikeTweet,
 };
