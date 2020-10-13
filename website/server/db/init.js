@@ -14,6 +14,14 @@ async function createUsersTable() {
   await db.query(queryText);
 }
 
+async function createUsersCredentialTable() {
+  const queryText = `CREATE TABLE IF NOT EXISTS usersCredential (
+    id INT references users(id),
+    password TEXT NOT NULL  
+    );`;
+  await db.query(queryText);
+}
+
 async function createTweetsTable() {
   const queryText = `CREATE TABLE IF NOT EXISTS tweets (
     id SERIAL PRIMARY KEY,
@@ -47,4 +55,5 @@ async function createFollowingTable() {
   await createTweetsTable();
   await createTweetsLikesTable();
   await createFollowingTable();
+  await createUsersCredentialTable();
 })().catch((err) => console.log(err));
