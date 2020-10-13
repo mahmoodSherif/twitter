@@ -10,9 +10,20 @@ async function createUser(req, res, next) {
   const queryText = `INSERT INTO users 
     (nickname, username, email, bio, photoUrl, bannerUrl)
     VALUES('${user.nickname}', '${user.username}', '${user.email}', 
-    '${user.bio}', '${user.photoUrl}', '${user.bannerUrl}')`;
+    '${user.bio}', '${user.photoUrl}', '${user.bannerUrl}') RETURNING id`;
+  let id;
   try {
-    await db.query(queryText);
+    const ret = await db.query(queryText);
+    id = ret.rows[0].id;
+  } catch (err) {
+    next(err);
+  }
+  const query2Text = `INSERT INTO usersCredential 
+    (id, password)
+    VALUES('${id}', '${user.password}')`;
+
+  try {
+    await db.query(query2Text);
     res.send(200);
   } catch (err) {
     next(err);
