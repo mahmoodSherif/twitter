@@ -45,7 +45,7 @@ async function findUserById(req, res, next) {
 
 async function follow(req, res, next) {
   const { userId } = req.body;
-  const { followerId } = req.body; // the current user
+  const followerId = req.user.id;
   const queryText = `INSERT INTO following (userId, followerId) 
     VALUES ('${userId}', '${followerId}') ON CONFLICT DO NOTHING`;
   try {
@@ -58,7 +58,7 @@ async function follow(req, res, next) {
 
 async function unfollow(req, res, next) {
   const { userId } = req.body;
-  const { followerId } = req.body; // the current user
+  const followerId = req.user.id;
   const queryText = `DELETE FROM following
     WHERE userId = '${userId}' AND followerId = '${followerId}' `;
   try {

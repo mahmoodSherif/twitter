@@ -14,7 +14,7 @@ async function feed(req, res, next) {
 }
 
 async function createTweet(req, res, next) {
-  const { userId } = req.body;
+  const userId = req.user.id;
   const { text } = req.body;
   const queryText = `INSERT INTO tweets 
   (userId, text, createdAt)
@@ -40,7 +40,7 @@ async function tweetsByUserId(req, res, next) {
 }
 
 async function likeTweet(req, res, next) {
-  const { userId } = req.body;
+  const userId = req.user.id;
   const { tweetId } = req.params;
   const queryText = `INSERT INTO tweetsLikes (userId, tweetId) 
     VALUES ('${userId}', '${tweetId}') ON CONFLICT DO NOTHING`;
@@ -53,7 +53,7 @@ async function likeTweet(req, res, next) {
 }
 
 async function unLikeTweet(req, res, next) {
-  const { userId } = req.body;
+  const userId = req.user.id;
   const { tweetId } = req.params;
   const queryText = `DELETE FROM tweetsLikes WHERE userId = '${userId}' 
     AND tweetId = '${tweetId}' `;
