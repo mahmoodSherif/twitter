@@ -1,7 +1,12 @@
 const db = require('../db');
 
 async function createUser(req, res, next) {
-  const user = req.body;
+  const user = {
+    bio: '',
+    photoUrl: '',
+    bannerUrl: '',
+    ...req.body,
+  };
   const queryText = `INSERT INTO users 
     (nickname, username, email, bio, photoUrl, bannerUrl)
     VALUES('${user.nickname}', '${user.username}', '${user.email}', 
