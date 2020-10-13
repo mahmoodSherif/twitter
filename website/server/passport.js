@@ -9,11 +9,12 @@ const db = require('./db');
 passport.use(new LocalStrategy(
   async (username, password, done) => {
     const query = `SELECT users.* FROM users INNER JOIN usersCredential ON users.id = usersCredential.id 
-            WHERE users.username = ${username} AND usersCredential.password = ${password}`;
+            WHERE users.username = '${username}' AND usersCredential.password = '${password}'`;
     let retUser;
     try {
       [retUser] = (await db.query(query)).rows;
     } catch (err) {
+      console.log(err);
       return done(err);
     }
     if (retUser.id) {

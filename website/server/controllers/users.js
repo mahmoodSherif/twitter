@@ -1,3 +1,5 @@
+const passport = require('passport');
+const jwt = require('jsonwebtoken');
 const db = require('../db');
 
 async function createUser(req, res, next) {
@@ -67,9 +69,29 @@ async function unfollow(req, res, next) {
   }
 }
 
+async function login(req, res, next) {
+  passport.authenticate('local', { session: false }, async (err, user, info) => {
+    if (err || !user) {
+      res.status(400).json({
+        message: 'lol',
+        user,
+        err,
+      });
+    }
+    req.login(user, { session: false }, async (err) => {
+      if (err) {
+        res.send(err);
+      }
+      const token = await jwt.sign(JSON.stringify(user), process.env.JWT);
+      res.json({ user, token });
+    });
+  })(req, res);
+}
+
 module.exports = {
   createUser,
   findUserById,
   follow,
   unfollow,
+  login,
 };
