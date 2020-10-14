@@ -1,11 +1,9 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import {
-  BrowserRouter as Router, Link, Route, Switch,
-} from 'react-router-dom';
-import App from './App';
-import SignIn from './components/SignIn/signIn';
-import AuthProvider from './contexts/auth';
+import React from "react";
+import ReactDOM from "react-dom";
+import { BrowserRouter as Router, Link, Route, Switch } from "react-router-dom";
+import App from "./App";
+import SignIn from "./components/SignIn/signIn";
+import AuthProvider from "./contexts/auth";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -28,9 +26,7 @@ ReactDOM.render(
           <Route exact path="/feed">
             <App />
           </Route>
-          <Route exact path="/profile">
-
-          </Route>
+          <Route exact path="/profile"></Route>
           <Route exact path="/signIn">
             <SignIn />
           </Route>
@@ -38,5 +34,5 @@ ReactDOM.render(
       </Router>
     </AuthProvider>
   </React.StrictMode>,
-  document.getElementById('root'),
+  document.getElementById("root")
 );

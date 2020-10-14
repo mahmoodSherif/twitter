@@ -1,6 +1,6 @@
-import React from 'react';
-import TweetForm from './components/TweetForm/TweetForm';
-import TweetList from './components/TweetList/TweetList';
+import React from "react";
+import TweetForm from "./components/TweetForm/TweetForm";
+import TweetList from "./components/TweetList/TweetList";
 
 function App() {
   return (
