@@ -1,32 +1,32 @@
-.tweet{
+.tweet {
   border: 1px solid gray;
   padding: 10px;
 }
 .avatar {
-    vertical-align: middle;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
+  vertical-align: middle;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
 }
-.naming{
+.naming {
   display: inline-block;
   margin: 15px;
 }
-.nickname{
+.nickname {
   margin: 0;
 }
-.username{
+.username {
   font-size: smaller;
   color: gray;
   margin: 0;
 }
-.date{
+.date {
   color: gray;
   font-size: smaller;
   vertical-align: 10px;
   display: inline-block;
   margin: 5px;
 }
-.liked{
+.liked {
   color: blue;
 }
