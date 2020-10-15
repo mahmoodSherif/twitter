@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Link, Route, Switch } from "react-router-dom";
 import App from "./App";
 import SignIn from "./components/SignIn/signIn";
+import SignUp from "./components/SignUp/signUp";
 import AuthProvider from "./contexts/auth";
 
 ReactDOM.render(
@@ -20,6 +21,9 @@ ReactDOM.render(
             <li>
               <Link to="/signIn">signIn</Link>
             </li>
+            <li>
+              <Link to="/signUp">signUp</Link>
+            </li>
           </ul>
         </div>
         <Switch>
@@ -29,6 +33,9 @@ ReactDOM.render(
           <Route exact path="/profile"></Route>
           <Route exact path="/signIn">
             <SignIn />
+          </Route>
+          <Route exact path="/signUp">
+            <SignUp />
           </Route>
         </Switch>
       </Router>
