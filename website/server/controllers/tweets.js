@@ -2,10 +2,11 @@ const db = require('../db');
 
 async function feed(req, res, next) {
   const userId = req.user.id;
-  const queryText = `SELECT row_to_json(tweets.*) as tweet, row_to_json(users.*) as user  FROM tweets 
+  const queryText = `SELECT row_to_json(tweets.*) AS tweet, row_to_json(users.*) AS user 
+    FROM tweets 
     INNER JOIN following ON tweets.userId = following.userId 
     INNER JOIN users ON tweets.userId = users.id
-    WHERE following.followerId = ${userId} OR tweets.userId = ${userId};`;
+    WHERE following.followerId = ${userId}`;
   try {
     const ret = await db.query(queryText);
     res.json(ret.rows);
