@@ -44,7 +44,7 @@ async function findUserById(req, res, next) {
 }
 
 async function follow(req, res, next) {
-  const { userId } = req.body;
+  const { userId } = req.params;
   const followerId = req.user.id;
   const queryText = `INSERT INTO following (userId, followerId) 
     VALUES ('${userId}', '${followerId}') ON CONFLICT DO NOTHING`;
@@ -57,7 +57,7 @@ async function follow(req, res, next) {
 }
 
 async function unfollow(req, res, next) {
-  const { userId } = req.body;
+  const { userId } = req.params;
   const followerId = req.user.id;
   const queryText = `DELETE FROM following
     WHERE userId = '${userId}' AND followerId = '${followerId}' `;
@@ -69,22 +69,26 @@ async function unfollow(req, res, next) {
   }
 }
 
-async function login(req, res, next) {
+async function followers(req, res, next) {
+  const { userId } = req.params;
+  const queryText = `SELECT ARRAY(SELECT followerId FROM following WHERE userId = ${userId});`;
+  try {
+    const ret = (await db.query(queryText)).rows[0].array;
+    res.json(ret);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function login(req, res) {
   passport.authenticate('local', { session: false }, async (err, user, info) => {
     if (err || !user) {
       res.status(400).json({
-        message: 'lol',
-        user,
-        err,
+        message: info.message,
       });
     }
-    req.login(user, { session: false }, async (err) => {
-      if (err) {
-        res.send(err);
-      }
-      const token = await jwt.sign(JSON.stringify(user), process.env.JWT);
-      res.json({ user, token });
-    });
+    const token = await jwt.sign(JSON.stringify(user), process.env.JWT);
+    res.json({ user, token });
   })(req, res);
 }
 
@@ -94,4 +98,5 @@ module.exports = {
   follow,
   unfollow,
   login,
+  followers,
 };
