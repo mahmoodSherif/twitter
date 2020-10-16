@@ -14,7 +14,6 @@ passport.use(new LocalStrategy(
     try {
       [retUser] = (await db.query(query)).rows;
     } catch (err) {
-      console.log(err);
       return done(err);
     }
     if (retUser.id) {
