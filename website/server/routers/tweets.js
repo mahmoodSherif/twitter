@@ -1,11 +1,12 @@
 const router = require('express').Router();
 const passport = require('passport');
 const {
-  createTweet, tweetsByUserId, likeTweet, unLikeTweet,
+  createTweet, tweetsByUserId, likeTweet, unLikeTweet, feed,
 } = require('../controllers/tweets');
 
 router.use(passport.authenticate('jwt', { session: false }));
 
+router.use('/feed/', feed);
 router.post('/tweets/', createTweet);
 router.get('/users/:userId/tweets/', tweetsByUserId);
 
