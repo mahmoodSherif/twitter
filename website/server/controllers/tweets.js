@@ -30,7 +30,10 @@ async function createTweet(req, res, next) {
 
 async function tweetsByUserId(req, res, next) {
   const { userId } = req.params;
-  const queryText = `SELECT * FROM tweets WHERE userId = '${userId}'
+  const queryText = `SELECT row_to_json(tweets.*) as tweet, row_to_json(users.*) as user 
+    FROM tweets 
+    INNER JOIN users ON tweets.userId = users.id
+    WHERE tweets.userId = '${userId}'
     ORDER BY createdAt DESC`;
   try {
     const ret = await db.query(queryText);
