@@ -1,7 +1,7 @@
 const db = require('../db');
 
 async function feed(req, res, next) {
-  const { userId } = req.params;
+  const userId = req.user.id;
   const queryText = `SELECT tweets.* FROM tweets 
     INNER JOIN following ON tweets.userId = following.userId 
     WHERE following.followerId = ${userId} OR tweets.userId = ${userId};`;
