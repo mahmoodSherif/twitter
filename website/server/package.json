@@ -6,7 +6,9 @@
     "start": "node ./server.js",
     "watch": "nodemon ./server.js",
     "db-init": "node ./db/init.js",
-    "db-drop": "node ./db/drop.js"
+    "db-drop": "node ./db/drop.js",
+    "db-populate": "node ./db/populate.js",
+    "db-re": "npm run db-drop && npm run db-init && npm run db-populate"
   },
   "dependencies": {
     "cors": "^2.8.5",
