@@ -27,7 +27,7 @@ async function createTweetsTable() {
     id SERIAL PRIMARY KEY,
     userId INT references users(id),
     text TEXT NOT NULL,
-    createdAt DATE NOT NULL
+    createdAt timestamp NOT NULL
     );`;
   await db.query(queryText);
 }
