@@ -1,3 +1,5 @@
+/* eslint-disable no-plusplus */
+/* eslint-disable no-await-in-loop */
 require('dotenv').config();
 const faker = require('faker');
 const db = require('./index');
@@ -21,18 +23,21 @@ async function createUser() {
   const ret = await db.query(queryText);
   const { id } = ret.rows[0];
 
+  const userFollowHimselfQuery = `INSERT INTO following VALUES (${id},${id})`;
   const query2Text = `INSERT INTO usersCredential 
   (id, password)
   VALUES('${id}', '${user.password}')`;
   await db.query(query2Text);
+  await db.query(userFollowHimselfQuery);
   return id;
 }
 
 async function createTweet(userId) {
-  const { text } = faker.lorem.text();
+  const text = faker.lorem.text();
+  const createdAt = faker.date.past().toISOString();
   const queryText = `INSERT INTO tweets 
     (userId, text, createdAt)
-    VALUES ('${userId}', '${text}', NOW() )`;
+    VALUES ('${userId}', '${text}', '${createdAt}')`;
   await db.query(queryText);
 }
 
@@ -44,22 +49,25 @@ async function follow(userId, followerId) {
 
 (async () => {
   const users = [
-    createUser(),
-    createUser(),
-    createUser(),
+    await createUser(),
+    await createUser(),
+    await createUser(),
 
   ];
-  users.forEach((userId) => {
-    createTweet(userId);
-    createTweet(userId);
-    createTweet(userId);
-    createTweet(userId);
-  });
-  users.forEach((userId) => {
-    users.forEach((followerId) => {
+  for (let i = 0; i < users.length; i++) {
+    const userId = users[i];
+    await createTweet(userId);
+    await createTweet(userId);
+    await createTweet(userId);
+    await createTweet(userId);
+  }
+  for (let i = 0; i < users.length; i++) {
+    const userId = users[i];
+    for (let j = 0; j < users.length; j++) {
+      const followerId = users[j];
       if (userId !== followerId) {
-        follow(userId, followerId);
+        await follow(userId, followerId);
       }
-    });
-  });
+    }
+  }
 })();
