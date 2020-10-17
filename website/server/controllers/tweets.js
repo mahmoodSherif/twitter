@@ -6,7 +6,8 @@ async function feed(req, res, next) {
     FROM tweets 
     INNER JOIN following ON tweets.userId = following.userId 
     INNER JOIN users ON tweets.userId = users.id
-    WHERE following.followerId = ${userId}`;
+    WHERE following.followerId = ${userId}
+    ORDER BY tweets.createdAt DESC`;
   try {
     const ret = await db.query(queryText);
     res.json(ret.rows);
