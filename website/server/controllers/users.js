@@ -20,12 +20,14 @@ async function createUser(req, res, next) {
   } catch (err) {
     next(err);
   }
+  const userFollowHimselfQuery = `INSERT INTO following VALUES (${id},${id})`;
   const query2Text = `INSERT INTO usersCredential 
     (id, password)
     VALUES('${id}', '${user.password}')`;
 
   try {
     await db.query(query2Text);
+    await db.query(userFollowHimselfQuery);
     res.send(200);
   } catch (err) {
     next(err);
