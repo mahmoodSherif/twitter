@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Link, Route, Switch } from "react-router-dom";
 import Feed from "./components/Feed";
 import SignIn from "./components/SignIn/signIn";
 import SignUp from "./components/SignUp/signUp";
+import UserProfile from "./components/UserProfile";
 import { AuthContext } from "./contexts/auth";
 
 function App() {
@@ -20,17 +21,25 @@ function App() {
           <li>
             <Link to="/signUp">signUp</Link>
           </li>
+          <li>
+            <Link to={`/userProfile/${currentUser.user?.id}`}>
+              user profile
+            </Link>
+          </li>
         </ul>
       </div>
       <Switch>
-        <Route exact path="/">
-          {currentUser.user ? <Feed /> : <SignIn />}
-        </Route>
         <Route exact path="/signIn">
           <SignIn />
         </Route>
         <Route exact path="/signUp">
           <SignUp />
+        </Route>
+        <Route exact path="/">
+          <Feed />
+        </Route>
+        <Route path="/userProfile/:userId">
+          <UserProfile />
         </Route>
       </Switch>
     </Router>
