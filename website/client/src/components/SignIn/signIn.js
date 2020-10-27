@@ -64,6 +64,8 @@ export default function SignIn() {
         user: data.user,
         token: data.token,
       });
+      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("token", data.token);
       setPassword("");
       setUsername("");
     }
