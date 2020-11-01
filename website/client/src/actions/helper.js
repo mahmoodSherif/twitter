@@ -1,25 +1,42 @@
 import Axios from "axios";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { AuthContext } from "../contexts/auth";
 
-export function useFetchData(url) {
+export function useFetchData() {
   const { currentUser } = useContext(AuthContext);
-  const [data, setData] = useState(null);
+  const [res, setRes] = useState({ data: null, error: null, isLoading: false });
 
-  useEffect(() => {
-    async function fetch() {
+  const fetch = useCallback(
+    async ({ url, headers = {}, method, postData }) => {
+      setRes((prev) => ({ ...prev, isLoading: true }));
+
+      if (method === "post") {
+        headers["Content-Type"] = "application/json";
+      }
+
       const config = {
-        method: "get",
+        method: method,
         url: "http://localhost:3000" + url,
         headers: {
+          ...headers,
           Authorization: "Bearer " + currentUser.token,
         },
+        data: {
+          ...postData,
+        },
       };
-      const ret = await Axios(config);
-      setData(ret.data);
-    }
-    fetch();
-  }, [currentUser.token, url]);
 
-  return data;
+      try {
+        const ret = await Axios(config);
+        setRes({ data: ret.data, error: null });
+      } catch (err) {
+        setRes({ data: null, error: err });
+      } finally {
+        setRes((prev) => ({ ...prev, isLoading: false }));
+      }
+    },
+    [currentUser.token]
+  );
+
+  return [res, fetch];
 }
