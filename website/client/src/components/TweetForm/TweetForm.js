@@ -36,9 +36,6 @@ export default function TweetForm() {
     fetch({ method: "post", url: "/tweets/", postData: { text } });
     setText("");
   }
-  const obj = {
-    error: !valid,
-  };
   return (
     <Paper className={classes.paper}>
       {tweet.isLoading && <LinearProgress />}
@@ -46,7 +43,7 @@ export default function TweetForm() {
         <Grid container justify="center" alignItems="center" direction="column">
           <Grid item>
             <TextField
-              {...obj}
+              error={!valid}
               label="new tweet"
               variant="outlined"
               value={text}
