@@ -1,23 +1,31 @@
-import axios from "axios";
+import {
+  Button,
+  Grid,
+  LinearProgress,
+  makeStyles,
+  Paper,
+  TextField,
+} from "@material-ui/core";
 import React, { useState } from "react";
+import { useFetchData } from "../../actions/helper";
 
-function addTweet(tweet) {
-  return axios({
-    method: "post",
-    url: "http://localhost:3000/tweets/",
-    headers: { "Content-Type": "application/json" },
-    data: {
-      ...tweet,
-    },
-  });
-}
+const useStyles = makeStyles({
+  root: {},
+  paper: {
+    padding: "15px",
+    width: "auto",
+  },
+});
 
 export default function TweetForm() {
   const [text, setText] = useState("");
   const [valid, setValid] = useState(true);
+  const classes = useStyles();
+  const [tweet, fetch] = useFetchData();
+
   function textChangeHandle(e) {
+    setText(e.target.value);
     if (e.target.value.length < 280) {
-      setText(e.target.value);
       setValid(true);
     } else {
       setValid(false);
@@ -25,19 +33,31 @@ export default function TweetForm() {
   }
   function submitHandle(e) {
     e.preventDefault();
+    fetch({ method: "post", url: "/tweets/", postData: { text } });
     setText("");
   }
+  const obj = {
+    error: !valid,
+  };
   return (
-    <form onSubmit={submitHandle}>
-      <input
-        style={{
-          color: valid ? undefined : "red",
-        }}
-        type="text"
-        value={text}
-        onChange={textChangeHandle}
-      />
-      <input type="submit" />
-    </form>
+    <Paper className={classes.paper}>
+      {tweet.isLoading && <LinearProgress />}
+      <form onSubmit={submitHandle} noValidate>
+        <Grid container justify="center" alignItems="center" direction="column">
+          <Grid item>
+            <TextField
+              {...obj}
+              label="new tweet"
+              variant="outlined"
+              value={text}
+              onChange={textChangeHandle}
+            />
+          </Grid>
+          <Button type="submit" variant="contained">
+            Tweet
+          </Button>
+        </Grid>
+      </form>
+    </Paper>
   );
 }
