@@ -11,24 +11,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-
-async function fetch(username, password) {
-  const ret = await axios({
-    method: "post",
-    url: "http://localhost:3000/login/",
-    headers: { "Content-Type": "application/json" },
-    data: {
-      username,
-      password,
-    },
-  });
-  switch (ret.status) {
-    case 200:
-      return ret.data;
-    default:
-      return false;
-  }
-}
+import { useFetchData } from "../../actions/helper";
 
 const useStyles = makeStyles({
   textField: {
@@ -47,6 +30,7 @@ export default function SignIn() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { currentUser, setCurrentUser } = useContext(AuthContext);
+  const [user, fetchUserData, endUser] = useFetchData();
 
   const classes = useStyles();
 
@@ -56,20 +40,27 @@ export default function SignIn() {
   function onPasswordChange(e) {
     setPassword(e.target.value);
   }
-  async function onSubmit(e) {
+  function onSubmit(e) {
     e.preventDefault();
-    const data = await fetch(username, password);
-    if (data) {
-      setCurrentUser({
-        user: data.user,
-        token: data.token,
-      });
-      localStorage.setItem("user", JSON.stringify(data.user));
-      localStorage.setItem("token", data.token);
-      setPassword("");
-      setUsername("");
-    }
+    fetchUserData({
+      postData: { username, password },
+      url: "/login/",
+      method: "post",
+    });
   }
+
+  if (user.data) {
+    setCurrentUser({
+      user: user.data.user,
+      token: user.data.token,
+    });
+    localStorage.setItem("user", JSON.stringify(user.data.user));
+    localStorage.setItem("token", user.data.token);
+    setPassword("");
+    setUsername("");
+    endUser();
+  }
+
   return currentUser.user ? (
     <h1>already signed in as {currentUser.user.username}</h1>
   ) : (
