@@ -16,6 +16,13 @@ export default function Feed() {
   const [tweets, fetch] = useFetchData();
   const classes = useStyles();
 
+  function updateTweets() {
+    fetch({
+      url: `/feed/`,
+      method: "get",
+    });
+  }
+
   useEffect(() => {
     fetch({
       url: `/feed/`,
@@ -25,7 +32,7 @@ export default function Feed() {
 
   return (
     <div>
-      <TweetForm />
+      <TweetForm update={updateTweets} />
       {tweets.isLoading && (
         <Grid container alignItems="center" justify="center">
           <CircularProgress className={classes.circularProgress} />

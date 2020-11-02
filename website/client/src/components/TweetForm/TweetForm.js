@@ -17,7 +17,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function TweetForm() {
+export default function TweetForm(props) {
   const [text, setText] = useState("");
   const [valid, setValid] = useState(true);
   const classes = useStyles();
@@ -35,6 +35,7 @@ export default function TweetForm() {
     e.preventDefault();
     fetch({ method: "post", url: "/tweets/", postData: { text } });
     setText("");
+    props.update();
   }
   return (
     <Paper className={classes.paper}>
