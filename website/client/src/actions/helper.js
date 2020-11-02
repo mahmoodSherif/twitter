@@ -6,8 +6,12 @@ export function useFetchData() {
   const { currentUser } = useContext(AuthContext);
   const [res, setRes] = useState({ data: null, error: null, isLoading: false });
 
+  const end = useCallback(() => {
+    setRes({ data: null, error: null, isLoading: false });
+  }, []);
+
   const fetch = useCallback(
-    async ({ url, headers = {}, method, postData }) => {
+    async ({ postData = {}, headers = {}, url, method }) => {
       setRes((prev) => ({ ...prev, isLoading: true }));
 
       if (method === "post") {
@@ -38,5 +42,5 @@ export function useFetchData() {
     [currentUser.token]
   );
 
-  return [res, fetch];
+  return [res, fetch, end];
 }
