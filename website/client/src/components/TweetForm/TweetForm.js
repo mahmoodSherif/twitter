@@ -13,7 +13,6 @@ const useStyles = makeStyles({
   root: {},
   paper: {
     padding: "15px",
-    width: "auto",
   },
 });
 
@@ -33,12 +32,16 @@ export default function TweetForm(props) {
   }
   function submitHandle(e) {
     e.preventDefault();
-    fetch({ method: "post", url: "/tweets/", postData: { text } });
+    fetch({
+      method: "post",
+      url: "/tweets/",
+      postData: { text },
+      callback: props.update,
+    });
     setText("");
-    props.update();
   }
   return (
-    <Paper className={classes.paper}>
+    <Paper className={classes.paper} width={1}>
       {tweet.isLoading && <LinearProgress />}
       <form onSubmit={submitHandle} noValidate>
         <Grid container justify="center" alignItems="center" direction="column">
