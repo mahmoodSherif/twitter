@@ -31,15 +31,34 @@ export default function Feed() {
   }, [currentUser.user.id, fetch]);
 
   return (
-    <div>
-      <TweetForm update={updateTweets} />
-      {tweets.isLoading && (
-        <Grid container alignItems="center" justify="center">
-          <CircularProgress className={classes.circularProgress} />
+    <Grid container direction="column" justify="center" alignItems="center">
+      <Grid
+        item
+        sm={12}
+        md={8}
+        lg={6}
+        container
+        spacing={1}
+        direction="column"
+        justify="center"
+        alignItems="stretch"
+      >
+        <Grid item>
+          <TweetForm update={updateTweets} />
         </Grid>
-      )}
-      {tweets.data && <TweetList tweets={tweets.data} />}
-      {tweets.error && <h1>ERROR</h1>}
-    </div>
+
+        {tweets.isLoading && (
+          <Grid item container alignItems="center" justify="center">
+            <CircularProgress className={classes.circularProgress} />
+          </Grid>
+        )}
+        {tweets.data && (
+          <Grid item>
+            <TweetList tweets={tweets.data} />
+          </Grid>
+        )}
+        {tweets.error && <h1>ERROR</h1>}
+      </Grid>
+    </Grid>
   );
 }
