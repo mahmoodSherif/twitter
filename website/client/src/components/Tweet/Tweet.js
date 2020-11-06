@@ -6,6 +6,7 @@ import {
   CardHeader,
   Collapse,
   IconButton,
+  makeStyles,
   TextField,
   Typography,
 } from "@material-ui/core";
@@ -27,7 +28,7 @@ export default function Tweet(props) {
     setLiked(!liked);
   }
   return (
-    <Card>
+    <Card width={1}>
       <CardHeader
         avatar={
           <Avatar aria-label="recipe">
