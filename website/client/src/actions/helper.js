@@ -11,7 +11,13 @@ export function useFetchData() {
   }, []);
 
   const fetch = useCallback(
-    async ({ postData = {}, headers = {}, url, method }) => {
+    async ({
+      postData = {},
+      headers = {},
+      url,
+      method,
+      callback = () => {},
+    }) => {
       setRes((prev) => ({ ...prev, isLoading: true }));
 
       if (method === "post") {
@@ -37,6 +43,7 @@ export function useFetchData() {
         setRes({ data: null, error: err });
       } finally {
         setRes((prev) => ({ ...prev, isLoading: false }));
+        callback();
       }
     },
     [currentUser.token]
