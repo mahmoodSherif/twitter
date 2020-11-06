@@ -1,15 +1,23 @@
+import { Grid, makeStyles } from "@material-ui/core";
 import React from "react";
 import Tweet from "../Tweet/Tweet";
 import "./tweetList.css";
 
 export default function TweetList(props) {
   return (
-    <ul>
+    <Grid
+      item
+      container
+      spacing={1}
+      direction="column"
+      justify="center"
+      alignItems="stretch"
+    >
       {props.tweets.map((tweetObj) => (
-        <li key={tweetObj.tweet.id}>
+        <Grid item>
           <Tweet tweet={tweetObj.tweet} user={tweetObj.user} />
-        </li>
+        </Grid>
       ))}
-    </ul>
+    </Grid>
   );
 }
