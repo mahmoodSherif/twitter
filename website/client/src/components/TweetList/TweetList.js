@@ -1,4 +1,4 @@
-import { Grid, makeStyles } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import React from "react";
 import Tweet from "../Tweet/Tweet";
 import "./tweetList.css";
@@ -15,7 +15,11 @@ export default function TweetList(props) {
     >
       {props.tweets.map((tweetObj) => (
         <Grid item>
-          <Tweet tweet={tweetObj.tweet} user={tweetObj.user} />
+          <Tweet
+            tweet={tweetObj.tweet}
+            user={tweetObj.user}
+            liked={tweetObj.liked}
+          />
         </Grid>
       ))}
     </Grid>
