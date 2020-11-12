@@ -1,9 +1,11 @@
 import { CircularProgress, Grid, makeStyles } from "@material-ui/core";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useFetchData } from "../../actions/helper";
+import { AuthContext } from "../../contexts/auth";
 import TweetForm from "../TweetForm/TweetForm";
 import TweetList from "../TweetList/TweetList";
+import UserInfo from "../UserInfo/UserInfo";
 
 const useStyles = makeStyles({
   circularProgress: {
@@ -16,6 +18,7 @@ export default function UserProfile() {
   const [user, fetchUser] = useFetchData();
   const [tweets, fetchTweets] = useFetchData();
   const classes = useStyles();
+  const { currentUser } = useContext(AuthContext);
 
   function updateTweets() {
     fetchTweets({ method: "get", url: `/users/${userId}/tweets` });
@@ -43,10 +46,12 @@ export default function UserProfile() {
         alignItems="stretch"
       >
         {user.data && (
-          <Grid item container>
-            <h3>{user.data.nickname}</h3>
-            <h3>@{user.data.username}</h3>
-            {/* <button>{followed}</button> */}
+          <Grid item>
+            <UserInfo
+              user={user.data}
+              sameUser={userId.toString() === currentUser.user.id.toString()}
+              followed={user.data.following}
+            />
           </Grid>
         )}
         <Grid item>
