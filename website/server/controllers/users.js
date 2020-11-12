@@ -37,9 +37,12 @@ async function createUser(req, res, next) {
 async function findUserById(req, res, next) {
   const { userId } = req.params;
   const queryText = `SELECT * FROM users WHERE id = ${userId}`;
+  const followingQuery = `SELECT * FROM following WHERE userId = ${userId}
+    AND followerId = ${req.user.id}`;
   try {
     const ret = await db.query(queryText);
-    res.json(ret.rows[0]);
+    const following = ((await db.query(followingQuery)).rowCount === 1);
+    res.json({ ...ret.rows[0], following });
   } catch (err) {
     next(err);
   }
