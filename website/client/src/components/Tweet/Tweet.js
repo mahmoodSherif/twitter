@@ -8,6 +8,7 @@ import {
   IconButton,
   makeStyles,
   TextField,
+  Tooltip,
   Typography,
 } from "@material-ui/core";
 import FavoriteIcon from "@material-ui/icons/Favorite";
@@ -15,23 +16,40 @@ import FavoriteBorder from "@material-ui/icons/FavoriteBorder";
 import CommentIcon from "@material-ui/icons/Comment";
 import React, { useState } from "react";
 import "./tweet.css";
+import { useHistory } from "react-router-dom";
+import { useFetchData } from "../../actions/helper";
 
 export default function Tweet(props) {
-  const [liked, setLiked] = useState(props.tweet.liked | false);
+  const [liked, setLiked] = useState(props.liked | false);
   const [expanded, setExpanded] = useState(false);
+  const [likeData, likeFetch, endLikeFetch] = useFetchData();
+  const history = useHistory();
 
   function handleExpandClick() {
     setExpanded(!expanded);
   }
 
   function handleLikeClick() {
-    setLiked(!liked);
+    if (!liked) {
+      likeFetch({ url: `/tweets/${props.tweet.id}/likes`, method: "post" });
+    } else {
+      likeFetch({ url: `/tweets/${props.tweet.id}/likes`, method: "delete" });
+    }
   }
+
+  if (likeData.data) {
+    setLiked(!liked);
+    endLikeFetch();
+  }
+
   return (
     <Card width={1}>
       <CardHeader
+        onClick={() => {
+          history.push(`/userProfile/${props.user.id}`);
+        }}
         avatar={
-          <Avatar aria-label="recipe">
+          <Avatar>
             <img src={props.user.photourl} alt="user" className="avatar" />
           </Avatar>
         }
