@@ -2,12 +2,15 @@ const db = require('../db');
 
 async function feed(req, res, next) {
   const userId = req.user.id;
-  const queryText = `SELECT row_to_json(tweets.*) AS tweet, row_to_json(users.*) AS user 
-    FROM tweets 
-    INNER JOIN following ON tweets.userId = following.userId 
-    INNER JOIN users ON tweets.userId = users.id
-    WHERE following.followerId = ${userId}
-    ORDER BY tweets.createdAt DESC`;
+  const queryText = `SELECT row_to_json(tweets.*) AS tweet, 
+  row_to_json(users.*) AS user,
+  (tweetslikes.tweetid is not null) AS liked
+  FROM tweets 
+  INNER JOIN following ON tweets.userId = following.userId 
+  INNER JOIN users ON tweets.userId = users.id
+  LEFT JOIN tweetsLikes ON tweetsLikes.tweetId = tweets.id
+  WHERE following.followerId = ${userId}
+  ORDER BY tweets.createdAt DESC`;
   try {
     const ret = await db.query(queryText);
     res.json(ret.rows);
@@ -32,9 +35,12 @@ async function createTweet(req, res, next) {
 
 async function tweetsByUserId(req, res, next) {
   const { userId } = req.params;
-  const queryText = `SELECT row_to_json(tweets.*) as tweet, row_to_json(users.*) as user 
+  const queryText = `SELECT row_to_json(tweets.*) as tweet,
+    row_to_json(users.*) as user,
+    (tweetslikes.tweetid is not null) AS liked
     FROM tweets 
     INNER JOIN users ON tweets.userId = users.id
+    LEFT JOIN tweetsLikes ON tweetsLikes.tweetId = tweets.id
     WHERE tweets.userId = '${userId}'
     ORDER BY createdAt DESC`;
   try {
