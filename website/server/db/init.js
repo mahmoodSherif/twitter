@@ -32,6 +32,17 @@ async function createTweetsTable() {
   await db.query(queryText);
 }
 
+async function createCommentsTable() {
+  const queryText = `CREATE TABLE IF NOT EXISTS comments (
+    id SERIAL PRIMARY KEY,
+    userId INT references users(id),
+    tweetId INT references tweets(id),
+    text TEXT NOT NULL,
+    createdAt timestamp NOT NULL
+    );`;
+  await db.query(queryText);
+}
+
 async function createTweetsLikesTable() {
   const queryText = `CREATE TABLE IF NOT EXISTS tweetsLikes (
     userId INT references users(id),
@@ -56,4 +67,5 @@ async function createFollowingTable() {
   await createTweetsLikesTable();
   await createFollowingTable();
   await createUsersCredentialTable();
+  await createCommentsTable();
 })().catch((err) => console.log(err));

@@ -37,7 +37,16 @@ async function createTweet(userId) {
   const createdAt = faker.date.past().toISOString();
   const queryText = `INSERT INTO tweets 
     (userId, text, createdAt)
-    VALUES ('${userId}', '${text}', '${createdAt}')`;
+    VALUES ('${userId}', '${text}', '${createdAt}') RETURNING id`;
+  return (await db.query(queryText)).rows[0].id;
+}
+
+async function createComment(userId, tweetId) {
+  const text = faker.lorem.text();
+  const createdAt = faker.date.past().toISOString();
+  const queryText = `INSERT INTO comments 
+    (userId, text, createdAt, tweetId)
+    VALUES ('${userId}', '${text}', '${createdAt}', ${tweetId})`;
   await db.query(queryText);
 }
 
@@ -54,12 +63,13 @@ async function follow(userId, followerId) {
     await createUser(),
 
   ];
+  const tweets = [];
   for (let i = 0; i < users.length; i++) {
     const userId = users[i];
-    await createTweet(userId);
-    await createTweet(userId);
-    await createTweet(userId);
-    await createTweet(userId);
+    tweets.push(await createTweet(userId));
+    tweets.push(await createTweet(userId));
+    tweets.push(await createTweet(userId));
+    tweets.push(await createTweet(userId));
   }
   for (let i = 0; i < users.length; i++) {
     const userId = users[i];
@@ -68,6 +78,11 @@ async function follow(userId, followerId) {
       if (userId !== followerId) {
         await follow(userId, followerId);
       }
+    }
+  }
+  for (let i = 0; i < tweets.length; i++) {
+    for (let j = 0; j < users.length; j++) {
+      await createComment(users[j], tweets[i]);
     }
   }
 })();

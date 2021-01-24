@@ -77,10 +77,44 @@ async function unLikeTweet(req, res, next) {
   }
 }
 
+async function comment(req, res, next) {
+  const userId = req.user.id;
+  const { tweetId } = req.params;
+  const { text } = req.body;
+  const queryText = `INSERT INTO comments (userId, tweetId, text, createdAt) 
+    VALUES (${userId} , ${tweetId} , '${text}', NOW() )`;
+
+  try {
+    await db.query(queryText);
+    res.sendStatus(200);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function commentByTweetId(req, res, next) {
+  const { tweetId } = req.params;
+  const queryText = `SELECT row_to_json(comments.*) as comment,
+  row_to_json(users.*) as user
+  FROM comments 
+  INNER JOIN users ON comments.userId = users.id
+  WHERE comments.tweetId = '${tweetId}'
+  ORDER BY createdAt DESC`;
+
+  try {
+    const ret = await db.query(queryText);
+    res.json(ret.rows);
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   feed,
   createTweet,
   tweetsByUserId,
   likeTweet,
   unLikeTweet,
+  comment,
+  commentByTweetId,
 };
