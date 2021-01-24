@@ -1,10 +1,13 @@
 import {
   Avatar,
+  Button,
   Card,
   CardActions,
   CardContent,
   CardHeader,
+  CircularProgress,
   Collapse,
+  Grid,
   IconButton,
   makeStyles,
   TextField,
@@ -18,30 +21,73 @@ import React, { useState } from "react";
 import "./tweet.css";
 import { useHistory } from "react-router-dom";
 import { useFetchData } from "../../actions/helper";
+import CommentsList from "../Comments/commentList";
+
+const useStyles = makeStyles({
+  circularProgress: {
+    padding: "10px",
+  },
+});
 
 export default function Tweet(props) {
   const [liked, setLiked] = useState(props.liked | false);
   const [expanded, setExpanded] = useState(false);
-  const [likeData, likeFetch, endLikeFetch] = useFetchData();
+  const [comments, setComments] = useState(null);
+  const [newCommentText, setNewCommentText] = useState("");
+
+  const [newLikeFetcher, fetchNewLike, clearLikeFetcher] = useFetchData();
+  const [
+    commentListFetcher,
+    fetchCommentList,
+    clearCommentListFetcher,
+  ] = useFetchData();
+  const [newCommentFetcher, fetchNewComment] = useFetchData();
+
   const history = useHistory();
+  const classes = useStyles();
 
   function handleExpandClick() {
     setExpanded(!expanded);
+    if (!comments) {
+      fetchCommentList({
+        url: `/tweets/${props.tweet.id}/comments/`,
+        method: "get",
+      });
+    }
   }
 
   function handleLikeClick() {
     if (!liked) {
-      likeFetch({ url: `/tweets/${props.tweet.id}/likes`, method: "post" });
+      fetchNewLike({ url: `/tweets/${props.tweet.id}/likes`, method: "post" });
     } else {
-      likeFetch({ url: `/tweets/${props.tweet.id}/likes`, method: "delete" });
+      fetchNewLike({
+        url: `/tweets/${props.tweet.id}/likes`,
+        method: "delete",
+      });
     }
   }
 
-  if (likeData.data) {
-    setLiked(!liked);
-    endLikeFetch();
+  function commentTextChangeHandle(e) {
+    setNewCommentText(e.target.value);
   }
 
+  function newCommentSubmit() {
+    fetchNewComment({
+      url: `/tweets/${props.tweet.id}/comments`,
+      method: "post",
+      postData: { text: newCommentText },
+    });
+  }
+
+  if (newLikeFetcher.data) {
+    setLiked(!liked);
+    clearLikeFetcher();
+  }
+
+  if (commentListFetcher.data) {
+    setComments(commentListFetcher.data);
+    clearCommentListFetcher();
+  }
   return (
     <Card width={1}>
       <CardHeader
@@ -71,7 +117,18 @@ export default function Tweet(props) {
       </CardActions>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
-          <TextField></TextField>
+          <TextField onChange={commentTextChangeHandle} text={newCommentText} />
+          <Button
+            variant="contained"
+            onClick={newCommentSubmit}
+            disabled={newCommentFetcher.isLoading}
+          >
+            Comment
+          </Button>
+          {commentListFetcher.isLoading && (
+            <CircularProgress className={classes.circularProgress} />
+          )}
+          {comments && <CommentsList comments={comments} />}
         </CardContent>
       </Collapse>
     </Card>
