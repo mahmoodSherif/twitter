@@ -7,11 +7,9 @@ import {
   CardHeader,
   CircularProgress,
   Collapse,
-  Grid,
   IconButton,
   makeStyles,
   TextField,
-  Tooltip,
   Typography,
 } from "@material-ui/core";
 import FavoriteIcon from "@material-ui/icons/Favorite";
@@ -41,7 +39,11 @@ export default function Tweet(props) {
     fetchCommentList,
     clearCommentListFetcher,
   ] = useFetchData();
-  const [newCommentFetcher, fetchNewComment] = useFetchData();
+  const [
+    newCommentFetcher,
+    fetchNewComment,
+    clearFetchNewComment,
+  ] = useFetchData();
 
   const history = useHistory();
   const classes = useStyles();
@@ -77,6 +79,7 @@ export default function Tweet(props) {
       method: "post",
       postData: { text: newCommentText },
     });
+    setNewCommentText("");
   }
 
   if (newLikeFetcher.data) {
@@ -87,6 +90,14 @@ export default function Tweet(props) {
   if (commentListFetcher.data) {
     setComments(commentListFetcher.data);
     clearCommentListFetcher();
+  }
+
+  if (newCommentFetcher.data) {
+    fetchCommentList({
+      url: `/tweets/${props.tweet.id}/comments/`,
+      method: "get",
+    });
+    clearFetchNewComment();
   }
   return (
     <Card width={1}>
@@ -117,7 +128,10 @@ export default function Tweet(props) {
       </CardActions>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
-          <TextField onChange={commentTextChangeHandle} text={newCommentText} />
+          <TextField
+            onChange={commentTextChangeHandle}
+            value={newCommentText}
+          />
           <Button
             variant="contained"
             onClick={newCommentSubmit}
