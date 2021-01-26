@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Feed from "./components/Feed";
+import Search from "./components/Search/search";
 import SignIn from "./components/SignIn/signIn";
 import SignUp from "./components/SignUp/signUp";
 import { TopBar } from "./components/TopBar";
@@ -22,6 +23,9 @@ function App() {
         </Route>
         <Route path="/userProfile/:userId">
           <UserProfile />
+        </Route>
+        <Route exact path="/users/search">
+          <Search />
         </Route>
       </Switch>
     </Router>

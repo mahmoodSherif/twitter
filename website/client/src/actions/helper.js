@@ -63,6 +63,7 @@ export async function fetch({ url, token, method, postData }) {
       ...postData,
     },
   };
+  console.log(config.url);
   try {
     return (await Axios(config)).data;
   } catch (err) {
