@@ -113,7 +113,7 @@ async function search(req, res, next) {
 
   try {
     const ret = await db.query(query);
-    res.json(ret.rows[0].json_agg);
+    res.json(ret.rows[0].json_agg ? ret.rows[0].json_agg : []);
   } catch (err) {
     next(err);
   }
