@@ -12,7 +12,7 @@ export default function CommentsList(props) {
       alignItems="stretch"
     >
       {props.comments.map((commentObj) => (
-        <Grid item>
+        <Grid item key={commentObj.comment.id}>
           <Comment comment={commentObj.comment} user={commentObj.user} />
         </Grid>
       ))}

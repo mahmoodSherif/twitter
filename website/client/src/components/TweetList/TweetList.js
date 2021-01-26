@@ -14,7 +14,7 @@ export default function TweetList(props) {
       alignItems="stretch"
     >
       {props.tweets.map((tweetObj) => (
-        <Grid item>
+        <Grid item key={tweetObj.tweet.id}>
           <Tweet
             tweet={tweetObj.tweet}
             user={tweetObj.user}
