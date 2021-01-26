@@ -5,7 +5,6 @@ import {
   CardActions,
   CardContent,
   CardHeader,
-  CircularProgress,
   Collapse,
   IconButton,
   makeStyles,
@@ -15,89 +14,86 @@ import {
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import FavoriteBorder from "@material-ui/icons/FavoriteBorder";
 import CommentIcon from "@material-ui/icons/Comment";
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./tweet.css";
 import { useHistory } from "react-router-dom";
-import { useFetchData } from "../../actions/helper";
 import CommentsList from "../Comments/commentList";
+import { AuthContext } from "../../contexts/auth";
+import { fetch } from "../../actions/helper";
 
-const useStyles = makeStyles({
-  circularProgress: {
-    padding: "10px",
-  },
-});
+function useLikeStatues(initLikeStatues, tweetId) {
+  const [liked, setLiked] = useState(initLikeStatues);
+  const [likeChange, setLikeChange] = useState("non");
+  const { currentUser } = useContext(AuthContext);
+
+  useEffect(() => {
+    console.log("useEffect");
+    const url = `/tweets/${tweetId}/likes`;
+    const method = likeChange === "like" ? "post" : "delete";
+
+    const run = async () => {
+      if (likeChange !== "non") {
+        await fetch({ url, method, token: currentUser.token });
+      }
+    };
+    run();
+  }, [currentUser.token, likeChange, tweetId]);
+
+  const toggle = () => {
+    setLikeChange(liked ? "disLike" : "like");
+    setLiked((prev) => !prev);
+  };
+
+  return [liked, toggle];
+}
+
+function useComments(tweetId) {
+  const [comments, setComments] = useState([]);
+  const [loadComments, setLoadComments] = useState(false);
+  const [newComment, setNewComment] = useState();
+  const { currentUser } = useContext(AuthContext);
+
+  useEffect(() => {
+    const url = `/tweets/${tweetId}/comments`;
+    const run = async () => {
+      if (newComment) {
+        await fetch({
+          url,
+          method: "post",
+          postData: newComment,
+          token: currentUser.token,
+        });
+      }
+      if (loadComments) {
+        setComments(
+          await fetch({ url, method: "get", token: currentUser.token })
+        );
+      }
+    };
+    run();
+  }, [currentUser.token, tweetId, newComment, loadComments]);
+
+  function load() {
+    setLoadComments(true);
+  }
+  return [comments, setNewComment, load];
+}
 
 export default function Tweet(props) {
-  const [liked, setLiked] = useState(props.liked | false);
   const [expanded, setExpanded] = useState(false);
-  const [comments, setComments] = useState(null);
+  const history = useHistory();
+
+  const [liked, toggleLiked] = useLikeStatues(props.liked, props.tweet.id);
+  const [comments, addNewComment, loadComments] = useComments(props.tweet.id);
   const [newCommentText, setNewCommentText] = useState("");
 
-  const [newLikeFetcher, fetchNewLike, clearLikeFetcher] = useFetchData();
-  const [
-    commentListFetcher,
-    fetchCommentList,
-    clearCommentListFetcher,
-  ] = useFetchData();
-  const [
-    newCommentFetcher,
-    fetchNewComment,
-    clearFetchNewComment,
-  ] = useFetchData();
-
-  const history = useHistory();
-  const classes = useStyles();
-
   function handleExpandClick() {
+    loadComments();
     setExpanded(!expanded);
-    if (!comments) {
-      fetchCommentList({
-        url: `/tweets/${props.tweet.id}/comments/`,
-        method: "get",
-      });
-    }
   }
-
-  function handleLikeClick() {
-    if (!liked) {
-      fetchNewLike({ url: `/tweets/${props.tweet.id}/likes`, method: "post" });
-    } else {
-      fetchNewLike({
-        url: `/tweets/${props.tweet.id}/likes`,
-        method: "delete",
-      });
-    }
-  }
-
-  function commentTextChangeHandle(e) {
-    setNewCommentText(e.target.value);
-  }
-
-  function newCommentSubmit() {
-    fetchNewComment({
-      url: `/tweets/${props.tweet.id}/comments`,
-      method: "post",
-      postData: { text: newCommentText },
-    });
+  function commentOnClick() {
+    addNewComment({ text: newCommentText });
     setNewCommentText("");
-  }
-
-  if (newLikeFetcher.data) {
-    setLiked(!liked);
-    clearLikeFetcher();
-  }
-
-  if (commentListFetcher.data) {
-    setComments(commentListFetcher.data);
-    clearCommentListFetcher();
-  }
-
-  if (newCommentFetcher.data) {
-    fetchCommentList({
-      url: `/tweets/${props.tweet.id}/comments/`,
-      method: "get",
-    });
-    clearFetchNewComment();
   }
   return (
     <Card width={1}>
@@ -119,7 +115,7 @@ export default function Tweet(props) {
         </Typography>
       </CardContent>
       <CardActions>
-        <IconButton aria-label="comment" onClick={handleLikeClick}>
+        <IconButton aria-label="comment" onClick={toggleLiked}>
           {liked ? <FavoriteIcon /> : <FavoriteBorder />}
         </IconButton>
         <IconButton onClick={handleExpandClick} aria-label="comment">
@@ -129,20 +125,13 @@ export default function Tweet(props) {
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
           <TextField
-            onChange={commentTextChangeHandle}
+            onChange={(e) => setNewCommentText(e.target.value)}
             value={newCommentText}
           />
-          <Button
-            variant="contained"
-            onClick={newCommentSubmit}
-            disabled={newCommentFetcher.isLoading}
-          >
+          <Button variant="contained" onClick={commentOnClick}>
             Comment
           </Button>
-          {commentListFetcher.isLoading && (
-            <CircularProgress className={classes.circularProgress} />
-          )}
-          {comments && <CommentsList comments={comments} />}
+          <CommentsList comments={comments} />
         </CardContent>
       </Collapse>
     </Card>

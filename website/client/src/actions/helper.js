@@ -51,3 +51,21 @@ export function useFetchData() {
 
   return [res, fetch, end];
 }
+
+export async function fetch({ url, token, method, postData }) {
+  const config = {
+    method,
+    url: "http://localhost:3000" + url,
+    headers: {
+      Authorization: "Bearer " + token,
+    },
+    data: {
+      ...postData,
+    },
+  };
+  try {
+    return (await Axios(config)).data;
+  } catch (err) {
+    console.log(err);
+  }
+}
