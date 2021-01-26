@@ -97,6 +97,28 @@ async function login(req, res) {
   })(req, res);
 }
 
+async function search(req, res, next) {
+  const userQuery = req.params.query;
+  const query = `SELECT json_agg(json_build_object(
+      'id', id,
+      'nickname', nickname,
+      'email', email,
+      'username', username
+      )) 
+      from users 
+      WHERE users.nickname like '${userQuery}%'
+      OR users.nickname like '% ${userQuery}%'
+      OR users.username like '${userQuery}%'
+      OR users.email like '${userQuery}%' `;
+
+  try {
+    const ret = await db.query(query);
+    res.json(ret.rows[0].json_agg);
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   createUser,
   findUserById,
@@ -104,4 +126,5 @@ module.exports = {
   unfollow,
   login,
   followers,
+  search,
 };
