@@ -1,5 +1,4 @@
 import React, { useContext, useState } from "react";
-import axios from "axios";
 import { AuthContext } from "../../contexts/auth";
 import {
   Button,
@@ -11,7 +10,8 @@ import {
   Typography,
 } from "@material-ui/core";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import { useFetchData } from "../../actions/helper";
+import { fetch } from "../../actions/helper";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles({
   textField: {
@@ -30,38 +30,32 @@ export default function SignIn() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { currentUser, setCurrentUser } = useContext(AuthContext);
-  const [user, fetchUserData, endUser] = useFetchData();
-
+  const history = useHistory();
+  if (currentUser?.user) {
+    history.push("/");
+  }
   const classes = useStyles();
 
-  function onUsernameChange(e) {
-    setUsername(e.target.value);
-  }
-  function onPasswordChange(e) {
-    setPassword(e.target.value);
-  }
   function onSubmit(e) {
     e.preventDefault();
-    fetchUserData({
-      postData: { username, password },
+    fetch({
       url: "/login/",
       method: "post",
+      postData: { username, password },
+    }).then((data) => {
+      const { user, token } = data;
+      setCurrentUser({
+        user,
+        token,
+      });
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("token", token);
+      setPassword("");
+      setUsername("");
     });
   }
 
-  if (user.data) {
-    setCurrentUser({
-      user: user.data.user,
-      token: user.data.token,
-    });
-    localStorage.setItem("user", JSON.stringify(user.data.user));
-    localStorage.setItem("token", user.data.token);
-    setPassword("");
-    setUsername("");
-    endUser();
-  }
-
-  return currentUser.user ? (
+  return currentUser?.user ? (
     <h1>already signed in as {currentUser.user.username}</h1>
   ) : (
     <Grid
@@ -91,7 +85,7 @@ export default function SignIn() {
               type="text"
               value={username}
               variant="outlined"
-              onChange={onUsernameChange}
+              onChange={(e) => setUsername(e.target.value)}
             />
             <TextField
               required
@@ -100,7 +94,7 @@ export default function SignIn() {
               type="password"
               value={password}
               variant="outlined"
-              onChange={onPasswordChange}
+              onChange={(e) => setPassword(e.target.value)}
             />
             <Button
               variant="contained"

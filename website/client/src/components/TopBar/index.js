@@ -23,7 +23,7 @@ export function TopBar() {
   const classes = useStyles();
 
   function onAccountCircleClick() {
-    if (currentUser.user) {
+    if (currentUser?.user) {
       history.push("/userProfile/" + currentUser.user.id);
     } else {
       history.push("/signIn");
@@ -31,7 +31,11 @@ export function TopBar() {
   }
 
   function onHomeClick() {
-    history.push("/");
+    if (currentUser?.user) {
+      history.push("/");
+    } else {
+      history.push("/signIn");
+    }
   }
 
   return (

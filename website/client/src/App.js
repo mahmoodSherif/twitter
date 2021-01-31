@@ -6,6 +6,7 @@ import SignIn from "./components/SignIn/signIn";
 import SignUp from "./components/SignUp/signUp";
 import { TopBar } from "./components/TopBar";
 import UserProfile from "./components/UserProfile";
+import { CheckSignIn } from "./contexts/auth";
 
 function App() {
   return (
@@ -19,13 +20,19 @@ function App() {
           <SignUp />
         </Route>
         <Route exact path="/">
-          <Feed />
+          <CheckSignIn>
+            <Feed />
+          </CheckSignIn>
         </Route>
         <Route path="/userProfile/:userId">
-          <UserProfile />
+          <CheckSignIn>
+            <UserProfile />
+          </CheckSignIn>
         </Route>
         <Route exact path="/users/search">
-          <Search />
+          <CheckSignIn>
+            <Search />
+          </CheckSignIn>
         </Route>
       </Switch>
     </Router>
