@@ -97,6 +97,16 @@ async function login(req, res) {
   })(req, res);
 }
 
+async function exist(req, res) {
+  const tokenUserId = req.user.id;
+  const reqId = req.params.userId;
+  if (tokenUserId === reqId) {
+    res.sendStatus(200);
+  } else {
+    res.sendStatus(404);
+  }
+}
+
 async function search(req, res, next) {
   const userQuery = req.params.query;
   const query = `SELECT json_agg(json_build_object(
@@ -127,4 +137,5 @@ module.exports = {
   login,
   followers,
   search,
+  exist,
 };

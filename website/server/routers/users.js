@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const passport = require('passport');
 const {
-  findUserById, createUser, follow, unfollow, login, followers, search,
+  findUserById, createUser, follow, unfollow, login, followers, search, exist,
 } = require('../controllers/users');
 
 router.post('/login/', login);
@@ -15,5 +15,7 @@ router.post('/users/:userId/followers', follow);
 router.delete('/users/:userId/followers', unfollow);
 
 router.get('/users/search/:query', search);
+
+router.get('/users/:userId/exist/', exist);
 
 module.exports = router;
