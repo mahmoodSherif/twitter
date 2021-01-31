@@ -9,7 +9,7 @@ async function feed(req, res, next) {
   INNER JOIN following ON tweets.userId = following.userId 
   INNER JOIN users ON tweets.userId = users.id
   LEFT JOIN tweetsLikes ON tweetsLikes.tweetId = tweets.id
-  WHERE following.followerId = ${userId}
+  WHERE following.followerId = '${userId}'
   ORDER BY tweets.createdAt DESC`;
   try {
     const ret = await db.query(queryText);
@@ -82,7 +82,7 @@ async function comment(req, res, next) {
   const { tweetId } = req.params;
   const { text } = req.body;
   const queryText = `INSERT INTO comments (userId, tweetId, text, createdAt) 
-    VALUES (${userId} , ${tweetId} , '${text}', NOW() )`;
+    VALUES ('${userId}' , '${tweetId}' , '${text}', NOW() )`;
 
   try {
     await db.query(queryText);

@@ -20,7 +20,7 @@ async function createUser(req, res, next) {
   } catch (err) {
     next(err);
   }
-  const userFollowHimselfQuery = `INSERT INTO following VALUES (${id},${id})`;
+  const userFollowHimselfQuery = `INSERT INTO following VALUES ('${id}','${id}')`;
   const query2Text = `INSERT INTO usersCredential 
     (id, password)
     VALUES('${id}', '${user.password}')`;
@@ -36,9 +36,9 @@ async function createUser(req, res, next) {
 
 async function findUserById(req, res, next) {
   const { userId } = req.params;
-  const queryText = `SELECT * FROM users WHERE id = ${userId}`;
-  const followingQuery = `SELECT * FROM following WHERE userId = ${userId}
-    AND followerId = ${req.user.id}`;
+  const queryText = `SELECT * FROM users WHERE id = '${userId}'`;
+  const followingQuery = `SELECT * FROM following WHERE userId = '${userId}'
+    AND followerId = '${req.user.id}'`;
   try {
     const ret = await db.query(queryText);
     const following = ((await db.query(followingQuery)).rowCount === 1);
@@ -76,7 +76,7 @@ async function unfollow(req, res, next) {
 
 async function followers(req, res, next) {
   const { userId } = req.params;
-  const queryText = `SELECT ARRAY(SELECT followerId FROM following WHERE userId = ${userId});`;
+  const queryText = `SELECT ARRAY(SELECT followerId FROM following WHERE userId = '${userId}');`;
   try {
     const ret = (await db.query(queryText)).rows[0].array;
     res.json(ret);

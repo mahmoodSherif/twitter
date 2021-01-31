@@ -2,6 +2,8 @@
 /* eslint-disable no-await-in-loop */
 require('dotenv').config();
 const faker = require('faker');
+
+faker.locale = 'en';
 const db = require('./index');
 
 async function createUser() {
@@ -23,7 +25,7 @@ async function createUser() {
   const ret = await db.query(queryText);
   const { id } = ret.rows[0];
 
-  const userFollowHimselfQuery = `INSERT INTO following VALUES (${id},${id})`;
+  const userFollowHimselfQuery = `INSERT INTO following VALUES ('${id}','${id}')`;
   const query2Text = `INSERT INTO usersCredential 
   (id, password)
   VALUES('${id}', '${user.password}')`;
@@ -46,7 +48,7 @@ async function createComment(userId, tweetId) {
   const createdAt = faker.date.past().toISOString();
   const queryText = `INSERT INTO comments 
     (userId, text, createdAt, tweetId)
-    VALUES ('${userId}', '${text}', '${createdAt}', ${tweetId})`;
+    VALUES ('${userId}', '${text}', '${createdAt}', '${tweetId}')`;
   await db.query(queryText);
 }
 

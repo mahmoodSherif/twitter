@@ -27,7 +27,7 @@ passport.use(new JWTStrategy({
   jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
   secretOrKey: process.env.JWT,
 }, async (jwtPayload, done) => {
-  const query = `SELECT * FROM users WHERE id = ${jwtPayload.id}`;
+  const query = `SELECT * FROM users WHERE id = '${jwtPayload.id}'`;
   try {
     const [user] = (await db.query(query)).rows;
     return done(null, user);
