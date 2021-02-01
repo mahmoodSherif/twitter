@@ -1,5 +1,6 @@
 import {
   Button,
+  Card,
   Grid,
   LinearProgress,
   makeStyles,
@@ -13,6 +14,7 @@ const useStyles = makeStyles({
   root: {},
   paper: {
     padding: "15px",
+    marginTop: "15px",
   },
 });
 
@@ -41,7 +43,7 @@ export default function TweetForm(props) {
     setText("");
   }
   return (
-    <Paper className={classes.paper} width={1}>
+    <Card className={classes.paper} width={1} variant="outlined" square>
       {tweet.isLoading && <LinearProgress />}
       <form onSubmit={submitHandle} noValidate>
         <Grid container justify="center" alignItems="center" direction="column">
@@ -59,6 +61,6 @@ export default function TweetForm(props) {
           </Button>
         </Grid>
       </form>
-    </Paper>
+    </Card>
   );
 }

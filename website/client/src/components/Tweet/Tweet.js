@@ -15,7 +15,6 @@ import FavoriteIcon from "@material-ui/icons/Favorite";
 import FavoriteBorder from "@material-ui/icons/FavoriteBorder";
 import CommentIcon from "@material-ui/icons/Comment";
 import React, { useContext, useEffect, useState } from "react";
-import "./tweet.css";
 import { useHistory } from "react-router-dom";
 import CommentsList from "../Comments/commentList";
 import { AuthContext } from "../../contexts/auth";
@@ -96,7 +95,7 @@ export default function Tweet(props) {
     setNewCommentText("");
   }
   return (
-    <Card width={1}>
+    <Card width={1} variant="outlined" square>
       <CardHeader
         onClick={() => {
           history.push(`/userProfile/${props.user.id}`);

@@ -26,7 +26,7 @@ export default function UserInfo(props) {
   }
 
   return (
-    <Card width={1}>
+    <Card width={1} variant="outlined" square>
       <CardMedia component="img" height="250" image={props.user.bannerurl} />
       <CardHeader
         avatar={<Avatar src={props.user.photourl} />}

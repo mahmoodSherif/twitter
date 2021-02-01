@@ -12,7 +12,7 @@ export default function Comment(props) {
   const history = useHistory();
 
   return (
-    <Card width={1}>
+    <Card width={1} variant="outlined" square>
       <CardHeader
         onClick={() => {
           history.push(`/userProfile/${props.user.id}`);
