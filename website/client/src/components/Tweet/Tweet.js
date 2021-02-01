@@ -5,6 +5,7 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  CircularProgress,
   Collapse,
   IconButton,
   makeStyles,
@@ -19,6 +20,7 @@ import { useHistory } from "react-router-dom";
 import CommentsList from "../Comments/commentList";
 import { AuthContext } from "../../contexts/auth";
 import { fetch } from "../../actions/helper";
+import { Fastfood } from "@material-ui/icons";
 
 function useLikeStatues(initLikeStatues, tweetId) {
   const [liked, setLiked] = useState(initLikeStatues);
@@ -48,42 +50,67 @@ function useLikeStatues(initLikeStatues, tweetId) {
 
 function useComments(tweetId) {
   const [comments, setComments] = useState([]);
-  const [loadComments, setLoadComments] = useState(false);
+  const [canLoadComments, setCanLoadComments] = useState(false);
   const [newComment, setNewComment] = useState();
   const { currentUser } = useContext(AuthContext);
+  const [commentStatus, setCommentStatus] = useState({
+    isLoading: false,
+    error: false,
+  });
 
   useEffect(() => {
     const url = `/tweets/${tweetId}/comments`;
     const run = async () => {
       if (newComment) {
-        await fetch({
-          url,
-          method: "post",
-          postData: newComment,
-          token: currentUser.token,
-        });
+        setCommentStatus({ error: false, isLoading: true });
+        try {
+          await fetch({
+            url,
+            method: "post",
+            postData: newComment,
+            token: currentUser.token,
+          });
+          setCommentStatus({ error: false, isLoading: false });
+        } catch (err) {
+          setCommentStatus({ error: true, isLoading: false });
+        }
       }
-      if (loadComments) {
-        setComments(
-          await fetch({ url, method: "get", token: currentUser.token })
-        );
+      if (canLoadComments) {
+        setCommentStatus({ error: false, isLoading: true });
+        try {
+          setComments(
+            await fetch({ url, method: "get", token: currentUser.token })
+          );
+          setCommentStatus({ error: false, isLoading: false });
+        } catch (err) {
+          setCommentStatus({ error: true, isLoading: false });
+        }
       }
     };
     run();
-  }, [currentUser.token, tweetId, newComment, loadComments]);
+  }, [currentUser.token, tweetId, newComment, canLoadComments]);
 
-  function load() {
-    setLoadComments(true);
+  function loadComments() {
+    setCanLoadComments(true);
   }
-  return [comments, setNewComment, load];
+  return { comments, setNewComment, loadComments, commentStatus };
 }
+
+const useStyles = makeStyles({
+  circularProgress: {
+    padding: "10px",
+  },
+});
 
 export default function Tweet(props) {
   const [expanded, setExpanded] = useState(false);
   const history = useHistory();
+  const classes = useStyles();
 
   const [liked, toggleLiked] = useLikeStatues(props.liked, props.tweet.id);
-  const [comments, addNewComment, loadComments] = useComments(props.tweet.id);
+  const { comments, setNewComment, loadComments, commentStatus } = useComments(
+    props.tweet.id
+  );
   const [newCommentText, setNewCommentText] = useState("");
 
   function handleExpandClick() {
@@ -91,7 +118,7 @@ export default function Tweet(props) {
     setExpanded(!expanded);
   }
   function commentOnClick() {
-    addNewComment({ text: newCommentText });
+    setNewComment({ text: newCommentText });
     setNewCommentText("");
   }
   return (
@@ -130,6 +157,9 @@ export default function Tweet(props) {
           <Button variant="contained" onClick={commentOnClick}>
             Comment
           </Button>
+          {commentStatus.isLoading && (
+            <CircularProgress className={classes.circularProgress} />
+          )}
           <CommentsList comments={comments} />
         </CardContent>
       </Collapse>
