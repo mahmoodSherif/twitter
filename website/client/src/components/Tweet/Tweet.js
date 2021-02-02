@@ -22,9 +22,10 @@ import { AuthContext } from "../../contexts/auth";
 import { fetch } from "../../actions/helper";
 import { Fastfood } from "@material-ui/icons";
 
-function useLikeStatues(initLikeStatues, tweetId) {
+function useLikeStatues(initLikeStatues, tweetId, initLikesCount) {
   const [liked, setLiked] = useState(initLikeStatues);
   const [likeChange, setLikeChange] = useState("non");
+  const [likesCount, setLikeCount] = useState(initLikesCount);
   const { currentUser } = useContext(AuthContext);
 
   useEffect(() => {
@@ -42,10 +43,15 @@ function useLikeStatues(initLikeStatues, tweetId) {
 
   const toggle = () => {
     setLikeChange(liked ? "disLike" : "like");
+    if (liked) {
+      setLikeCount((prev) => prev - 1);
+    } else {
+      setLikeCount((prev) => prev + 1);
+    }
     setLiked((prev) => !prev);
   };
 
-  return [liked, toggle];
+  return [liked, toggle, likesCount];
 }
 
 function useComments(tweetId) {
@@ -106,8 +112,11 @@ export default function Tweet(props) {
   const [expanded, setExpanded] = useState(false);
   const history = useHistory();
   const classes = useStyles();
-
-  const [liked, toggleLiked] = useLikeStatues(props.liked, props.tweet.id);
+  const [liked, toggleLiked, likesCount] = useLikeStatues(
+    props.liked,
+    props.tweet.id,
+    props.tweet.likes_count
+  );
   const { comments, setNewComment, loadComments, commentStatus } = useComments(
     props.tweet.id
   );
@@ -141,9 +150,10 @@ export default function Tweet(props) {
         </Typography>
       </CardContent>
       <CardActions>
-        <IconButton aria-label="comment" onClick={toggleLiked}>
+        <IconButton aria-label="like" onClick={toggleLiked}>
           {liked ? <FavoriteIcon /> : <FavoriteBorder />}
         </IconButton>
+        {likesCount}
         <IconButton onClick={handleExpandClick} aria-label="comment">
           <CommentIcon />
         </IconButton>

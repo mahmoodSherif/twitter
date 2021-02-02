@@ -27,7 +27,9 @@ async function createTweetsTable() {
     id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     userId uuid references users(id),
     text TEXT NOT NULL,
-    createdAt timestamp NOT NULL
+    createdAt timestamp NOT NULL,
+    likes_count integer NOT NULL DEFAULT 0,
+    comments_count integer NOT NULL DEFAULT 0
     );`;
   await db.query(queryText);
 }

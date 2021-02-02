@@ -54,26 +54,32 @@ async function tweetsByUserId(req, res, next) {
 async function likeTweet(req, res, next) {
   const userId = req.user.id;
   const { tweetId } = req.params;
-  const queryText = `INSERT INTO tweetsLikes (userId, tweetId) 
+  const newLikeQuery = `INSERT INTO tweetsLikes (userId, tweetId) 
     VALUES ('${userId}', '${tweetId}') ON CONFLICT DO NOTHING`;
-  try {
-    await db.query(queryText);
+  const incLikeCount = `UPDATE tweets 
+    SET likes_count = likes_count +1
+    WHERE id = '${tweetId}'`;
+  const ret = await db.startTransaction([newLikeQuery, incLikeCount]);
+  if (!ret) {
     res.sendStatus(200);
-  } catch (err) {
-    next(err);
+  } else {
+    next();
   }
 }
 
 async function unLikeTweet(req, res, next) {
   const userId = req.user.id;
   const { tweetId } = req.params;
-  const queryText = `DELETE FROM tweetsLikes WHERE userId = '${userId}' 
+  const deleteLikeQuery = `DELETE FROM tweetsLikes WHERE userId = '${userId}' 
     AND tweetId = '${tweetId}' `;
-  try {
-    await db.query(queryText);
+  const decLikeCount = `UPDATE tweets 
+    SET likes_count = likes_count - 1
+    WHERE id = '${tweetId}'`;
+  const ret = await db.startTransaction([deleteLikeQuery, decLikeCount]);
+  if (!ret) {
     res.sendStatus(200);
-  } catch (err) {
-    next(err);
+  } else {
+    next();
   }
 }
 
