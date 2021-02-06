@@ -54,11 +54,12 @@ function useLikeStatues(initLikeStatues, tweetId, initLikesCount) {
   return [liked, toggle, likesCount];
 }
 
-function useComments(tweetId) {
+function useComments(tweetId, initCommentsCount) {
   const [comments, setComments] = useState([]);
   const [canLoadComments, setCanLoadComments] = useState(false);
   const [newComment, setNewComment] = useState();
   const { currentUser } = useContext(AuthContext);
+  const [commentsCount, setCommentsCount] = useState(initCommentsCount);
   const [commentStatus, setCommentStatus] = useState({
     isLoading: false,
     error: false,
@@ -77,6 +78,7 @@ function useComments(tweetId) {
             token: currentUser.token,
           });
           setCommentStatus({ error: false, isLoading: false });
+          setCommentsCount((prev) => prev + 1);
         } catch (err) {
           setCommentStatus({ error: true, isLoading: false });
         }
@@ -99,7 +101,13 @@ function useComments(tweetId) {
   function loadComments() {
     setCanLoadComments(true);
   }
-  return { comments, setNewComment, loadComments, commentStatus };
+  return {
+    comments,
+    setNewComment,
+    loadComments,
+    commentStatus,
+    commentsCount,
+  };
 }
 
 const useStyles = makeStyles({
@@ -117,9 +125,13 @@ export default function Tweet(props) {
     props.tweet.id,
     props.tweet.likes_count
   );
-  const { comments, setNewComment, loadComments, commentStatus } = useComments(
-    props.tweet.id
-  );
+  const {
+    comments,
+    setNewComment,
+    loadComments,
+    commentStatus,
+    commentsCount,
+  } = useComments(props.tweet.id, props.tweet.comments_count);
   const [newCommentText, setNewCommentText] = useState("");
 
   function handleExpandClick() {
@@ -157,6 +169,7 @@ export default function Tweet(props) {
         <IconButton onClick={handleExpandClick} aria-label="comment">
           <CommentIcon />
         </IconButton>
+        {commentsCount}
       </CardActions>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>

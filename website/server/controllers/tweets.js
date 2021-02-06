@@ -89,12 +89,14 @@ async function comment(req, res, next) {
   const { text } = req.body;
   const queryText = `INSERT INTO comments (userId, tweetId, text, createdAt) 
     VALUES ('${userId}' , '${tweetId}' , '${text}', NOW() )`;
-
-  try {
-    await db.query(queryText);
+  const incCommentsCount = `UPDATE tweets 
+    SET comments_count = comments_count + 1
+    WHERE id = '${tweetId}'`;
+  const ret = await db.startTransaction([queryText, incCommentsCount]);
+  if (!ret) {
     res.sendStatus(200);
-  } catch (err) {
-    next(err);
+  } else {
+    next();
   }
 }
 
