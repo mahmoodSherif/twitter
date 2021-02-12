@@ -28,7 +28,7 @@ async function createUser(req, res, next) {
   try {
     await db.query(query2Text);
     await db.query(userFollowHimselfQuery);
-    res.send(200);
+    res.send({id});
   } catch (err) {
     next(err);
   }

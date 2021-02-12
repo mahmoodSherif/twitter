@@ -24,10 +24,11 @@ async function createTweet(req, res, next) {
   const { text } = req.body;
   const queryText = `INSERT INTO tweets 
   (userId, text, createdAt)
-  VALUES ('${userId}', '${text}', NOW() )`;
+  VALUES ('${userId}', '${text}', NOW() ) RETURNING id`;
   try {
-    await db.query(queryText);
-    res.json('OK');
+    const ret = await db.query(queryText);
+    const id = ret.rows[0].id;
+    res.json({id});
   } catch (err) {
     next(err);
   }

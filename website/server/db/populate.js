@@ -2,11 +2,27 @@
 /* eslint-disable no-await-in-loop */
 require('dotenv').config();
 const faker = require('faker');
+const axios = require('axios');
 
 faker.locale = 'en';
 const db = require('./index');
+const { password } = require('pg/lib/defaults');
 
-async function createUser() {
+const userById = {};
+
+async function getToken(username, password){
+  const config = {
+    method: 'post',
+    url: 'http://localhost:3000/login/',
+    headers: { 
+      'Content-Type': 'application/json'
+    },
+    data : {username, password}
+  };
+  return (await axios(config)).data.token;
+}
+
+async function createUser(userObj) {
   const user = {
     nickname: faker.name.findName(),
     username: faker.internet.userName(),
@@ -15,41 +31,57 @@ async function createUser() {
     photoUrl: faker.image.avatar(),
     bannerUrl: faker.image.image(),
     password: 'pass',
+    ...userObj,
   };
 
-  const queryText = `INSERT INTO users 
-  (nickname, username, email, bio, photoUrl, bannerUrl)
-  VALUES('${user.nickname}', '${user.username}', '${user.email}', 
-  '${user.bio}', '${user.photoUrl}', '${user.bannerUrl}') RETURNING id`;
-
-  const ret = await db.query(queryText);
-  const { id } = ret.rows[0];
-
-  const userFollowHimselfQuery = `INSERT INTO following VALUES ('${id}','${id}')`;
-  const query2Text = `INSERT INTO usersCredential 
-  (id, password)
-  VALUES('${id}', '${user.password}')`;
-  await db.query(query2Text);
-  await db.query(userFollowHimselfQuery);
+  const config = {
+    method: 'post',
+    url: 'http://localhost:3000/users/',
+    headers: { 
+      'Content-Type': 'application/json'
+    },
+    data : user
+  };
+  const id =  (await axios(config)).data.id;
+  userById[id] = {username: user.username, password: user.password, token: await getToken(user.username, user.password)};
   return id;
 }
 
 async function createTweet(userId) {
   const text = faker.lorem.text();
-  const createdAt = faker.date.past().toISOString();
-  const queryText = `INSERT INTO tweets 
-    (userId, text, createdAt)
-    VALUES ('${userId}', '${text}', '${createdAt}') RETURNING id`;
-  return (await db.query(queryText)).rows[0].id;
+  const tweet = {
+    text,
+  }
+  const token = userById[userId].token;
+
+  const config = {
+    method: 'post',
+    url: 'http://localhost:3000/tweets/',
+    headers: { 
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    data : tweet
+  };
+    
+  return (await axios(config)).data.id;
 }
 
 async function createComment(userId, tweetId) {
   const text = faker.lorem.text();
-  const createdAt = faker.date.past().toISOString();
-  const queryText = `INSERT INTO comments 
-    (userId, text, createdAt, tweetId)
-    VALUES ('${userId}', '${text}', '${createdAt}', '${tweetId}')`;
-  await db.query(queryText);
+  const token = userById[userId].token;
+
+  const config = {
+    method: 'post',
+    url: `http://localhost:3000/tweets/${tweetId}/comments`,
+    headers: { 
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    data : {text}
+  };
+    
+  await axios(config);
 }
 
 async function follow(userId, followerId) {
@@ -60,6 +92,7 @@ async function follow(userId, followerId) {
 
 (async () => {
   const users = [
+    await createUser({username: "root"}),
     await createUser(),
     await createUser(),
     await createUser(),

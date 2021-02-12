@@ -11,6 +11,7 @@
     "db-re": "npm run db-drop && npm run db-init && npm run db-populate"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "cors": "^2.8.5",
     "debug": "~2.6.9",
     "dotenv": "^8.2.0",

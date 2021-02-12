@@ -1,6 +1,10 @@
 require('dotenv').config();
 const db = require('./index');
 
+async function importUUID(){
+  await db.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";');
+}
+
 async function createUsersTable() {
   const queryText = `CREATE TABLE IF NOT EXISTS users (
     id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -64,6 +68,7 @@ async function createFollowingTable() {
 }
 
 (async () => {
+  await importUUID();
   await createUsersTable();
   await createTweetsTable();
   await createTweetsLikesTable();
