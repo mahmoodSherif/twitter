@@ -2,14 +2,19 @@ const db = require('../db');
 
 async function feed(req, res, next) {
   const userId = req.user.id;
-  const queryText = `SELECT row_to_json(tweets.*) AS tweet, 
-  row_to_json(users.*) AS user,
-  (tweetslikes.tweetid is not null) AS liked
+  const queryText = `SELECT 
+	row_to_json(tweets.*) AS tweet, 
+  	row_to_json(users.*) AS user,
+  	(tweetslikes.tweetid is not null) AS liked,
+  	count(retweets.userId) retweets
   FROM tweets 
-  INNER JOIN following ON tweets.userId = following.userId 
   INNER JOIN users ON tweets.userId = users.id
+  LEFT JOIN retweets ON tweets.id = retweets.tweetId
+  INNER JOIN following ON (tweets.userId = following.userId 
+						   OR retweets.userid = following.userId )
+  	AND (following.followerId = '${userId}')
   LEFT JOIN tweetsLikes ON tweetsLikes.tweetId = tweets.id
-  WHERE following.followerId = '${userId}'
+  group by (tweets.*, users.*, tweetslikes.tweetid, tweets.createdAt)
   ORDER BY tweets.createdAt DESC`;
   try {
     const ret = await db.query(queryText);
