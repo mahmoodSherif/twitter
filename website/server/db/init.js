@@ -67,6 +67,15 @@ async function createFollowingTable() {
   await db.query(queryText);
 }
 
+async function createRetweetsTable() {
+  const queryText = `CREATE TABLE IF NOT EXISTS retweets (
+    userId uuid references users(id),
+    tweetId uuid references tweets(id),
+    PRIMARY KEY(tweetId, userId)
+    );`;
+  await db.query(queryText);
+}
+
 (async () => {
   await importUUID();
   await createUsersTable();
@@ -75,4 +84,5 @@ async function createFollowingTable() {
   await createFollowingTable();
   await createUsersCredentialTable();
   await createCommentsTable();
+  await createRetweetsTable();
 })().catch((err) => console.log(err));
