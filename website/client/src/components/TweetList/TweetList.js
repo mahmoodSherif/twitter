@@ -19,6 +19,7 @@ export default function TweetList(props) {
             tweet={tweetObj.tweet}
             user={tweetObj.user}
             liked={tweetObj.liked}
+            retweeted={tweetObj.retweeted}
           />
         </Grid>
       ))}

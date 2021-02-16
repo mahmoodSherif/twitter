@@ -13,6 +13,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import FavoriteIcon from "@material-ui/icons/Favorite";
+import LoopIcon from '@material-ui/icons/Loop';
 import FavoriteBorder from "@material-ui/icons/FavoriteBorder";
 import CommentIcon from "@material-ui/icons/Comment";
 import React, { useContext, useEffect, useState } from "react";
@@ -52,6 +53,31 @@ function useLikeStatues(initLikeStatues, tweetId, initLikesCount) {
   };
 
   return [liked, toggle, likesCount];
+}
+
+function useRetweetedStatues(initRetweetedStatues, tweetId) {
+  const [retweeted, setRetweeted] = useState(initRetweetedStatues);
+  const [retweetedChange, setRetweetedChange] = useState("non");
+  const { currentUser } = useContext(AuthContext);
+
+  useEffect(() => {
+    const url = `/tweets/${tweetId}/retweets`;
+    const method = retweetedChange === "retweet" ? "post" : "delete";
+
+    const run = async () => {
+      if (retweetedChange !== "non") {
+        await fetch({ url, method, token: currentUser.token });
+      }
+    };
+    run();
+  }, [currentUser.token, retweetedChange, tweetId]);
+
+  const toggle = () => {
+    setRetweetedChange(retweeted ? "unRetweet" : "retweet");
+    setRetweeted((prev) => !prev);
+  };
+
+  return [retweeted, toggle];
 }
 
 function useComments(tweetId, initCommentsCount) {
@@ -125,6 +151,10 @@ export default function Tweet(props) {
     props.tweet.id,
     props.tweet.likes_count
   );
+  const [retweeted, toggleretweeted] = useRetweetedStatues(
+    props.retweeted,
+    props.tweet.id
+  );
   const {
     comments,
     setNewComment,
@@ -170,6 +200,9 @@ export default function Tweet(props) {
           <CommentIcon />
         </IconButton>
         {commentsCount}
+        <IconButton onClick={toggleretweeted} aria-label="retweet">
+          <LoopIcon color={retweeted?"primary":""}/>
+        </IconButton>
       </CardActions>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
