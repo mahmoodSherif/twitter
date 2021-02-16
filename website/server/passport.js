@@ -16,7 +16,7 @@ passport.use(new LocalStrategy(
     } catch (err) {
       return done(err);
     }
-    if (retUser.id) {
+    if (retUser?.id) {
       return done(null, retUser);
     }
     return done(null, false, { message: 'wrong credentials' });

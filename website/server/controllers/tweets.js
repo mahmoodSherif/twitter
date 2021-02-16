@@ -6,15 +6,16 @@ async function feed(req, res, next) {
 	row_to_json(tweets.*) AS tweet, 
   	row_to_json(users.*) AS user,
   	(tweetslikes.tweetid is not null) AS liked,
-  	count(retweets.userId) retweets
+  	count(DISTINCT retweets.userId) retweets, 
+	( '${userId}' = any(array_agg(retweets.userId)) is true) as retweeted
   FROM tweets 
   INNER JOIN users ON tweets.userId = users.id
+  LEFT JOIN tweetsLikes ON tweetsLikes.tweetId = tweets.id
   LEFT JOIN retweets ON tweets.id = retweets.tweetId
   INNER JOIN following ON (tweets.userId = following.userId 
-						   OR retweets.userid = following.userId )
+						   OR (retweets.userid = following.userId and following.userId != '${userId}') )
   	AND (following.followerId = '${userId}')
-  LEFT JOIN tweetsLikes ON tweetsLikes.tweetId = tweets.id
-  group by (tweets.*, users.*, tweetslikes.tweetid, tweets.createdAt)
+  group by (tweets.createdAt, tweets.id, users.*, tweetslikes.tweetid )
   ORDER BY tweets.createdAt DESC`;
   try {
     const ret = await db.query(queryText);
@@ -89,6 +90,34 @@ async function unLikeTweet(req, res, next) {
   }
 }
 
+async function reTweet(req, res, next) {
+  const userId = req.user.id;
+  const { tweetId } = req.params;
+  const queryText = `INSERT INTO retweets (userId, tweetId) 
+    VALUES ('${userId}', '${tweetId}') ON CONFLICT DO NOTHING`;
+
+  try{
+    await db.query(queryText);
+    res.sendStatus(200);
+  } catch(err) {
+    next(err);
+  }
+}
+
+async function unReTweet(req, res, next) {
+  const userId = req.user.id;
+  const { tweetId } = req.params;
+  const queryText = `DELETE FROM retweets WHERE userId = '${userId}' 
+    AND tweetId = '${tweetId}' `;
+  
+  try{
+    await db.query(queryText);
+    res.sendStatus(200);
+  } catch(err) {
+    next(err);
+  }
+}
+
 async function comment(req, res, next) {
   const userId = req.user.id;
   const { tweetId } = req.params;
@@ -131,4 +160,6 @@ module.exports = {
   unLikeTweet,
   comment,
   commentByTweetId,
+  reTweet,
+  unReTweet,
 };
